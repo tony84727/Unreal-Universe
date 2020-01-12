@@ -27,9 +27,11 @@ public class ItemEntitySpawner extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
         final ItemStack itemStack = playerIn.getHeldItem(handIn);
-        worldIn.addEntity(getEntityThrower().spawn(worldIn, playerIn));
+        if (!worldIn.isRemote()) {
+            worldIn.addEntity(getEntityThrower().spawn(worldIn, playerIn, itemStack));
+        }
         if (!playerIn.isCreative()) {
-            itemStack.grow(-1);
+            itemStack.shrink(1);
         }
         return ActionResult.newResult(ActionResultType.SUCCESS, itemStack);
     }

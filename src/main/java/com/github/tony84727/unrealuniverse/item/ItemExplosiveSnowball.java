@@ -5,7 +5,7 @@ import com.github.tony84727.unrealuniverse.entity.EntityExplosiveSnowball;
 
 public class ItemExplosiveSnowball extends ItemEntitySpawner {
     public ItemExplosiveSnowball(Properties builder) {
-        super(builder, (world, thrower) -> {
+        super(builder, (world, thrower, itemStack) -> {
             final EntityExplosiveSnowball entity = new EntityExplosiveSnowball(world, thrower);
             entity.setSplitCount(1);
             entity.shoot(thrower, thrower.rotationPitch, thrower.rotationYaw, 0, 1, 0);

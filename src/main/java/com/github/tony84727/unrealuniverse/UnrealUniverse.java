@@ -1,7 +1,9 @@
 package com.github.tony84727.unrealuniverse;
 
 import com.github.tony84727.unrealuniverse.client.ClientProxy;
+import com.github.tony84727.unrealuniverse.entity.EntityIncendiaryGrenade;
 import com.github.tony84727.unrealuniverse.item.Items;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -17,7 +19,7 @@ public class UnrealUniverse {
     public static final Items items = new Items();
 
     public UnrealUniverse() {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> new ClientProxy());
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientProxy::new);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -30,6 +32,12 @@ public class UnrealUniverse {
         @SubscribeEvent
         public static void onModelRegistry(final ModelRegistryEvent e) {
             OBJLoader.INSTANCE.addDomain(UnrealUniverse.MOD_ID);
+        }
+
+        @SubscribeEvent
+        public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> event) {
+            EntityIncendiaryGrenade.ENTITY_TYPE.setRegistryName(MOD_ID + ":incendiary_grenade");
+            event.getRegistry().register(EntityIncendiaryGrenade.ENTITY_TYPE);
         }
     }
 }
