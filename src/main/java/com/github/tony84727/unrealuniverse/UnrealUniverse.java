@@ -36,7 +36,7 @@ public class UnrealUniverse {
 
         @SubscribeEvent
         public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> event) {
-            EntityIncendiaryGrenade.ENTITY_TYPE.setRegistryName(MOD_ID + ":incendiary_grenade");
+            EntityIncendiaryGrenade.ENTITY_TYPE.setRegistryName(MOD_ID, "incendiary_grenade");
             event.getRegistry().register(EntityIncendiaryGrenade.ENTITY_TYPE);
         }
     }
