@@ -25,3 +25,5 @@ run
 forge*changelog.txt
 
 .DS_Store
+
+/secret.properties

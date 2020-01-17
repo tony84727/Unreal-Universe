@@ -3,17 +3,23 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: "com.matthewprenger.cursegradle"
 
-version = '1.0'
+
+version = 'dev'
 group = 'com.github.tony84727' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'unrealuniverse'
 
@@ -74,7 +80,7 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'unrealuniverse', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 unrealuniverse {
@@ -109,4 +115,22 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+}
+
+def secretFile = file('secret.properties')
+def curseforgeAPI = ""
+if (secretFile.exists()) {
+    def secretProperties = new Properties()
+    secretFile.withInputStream {
+        secretProperties.load(it)
+    }
+    curseforgeAPI = secretProperties.getProperty("curseforge_token")
+}
+
+curseforge {
+    apiKey = curseforgeAPI
+    project {
+        id = '358074'
+        releaseType = 'alpha'
+    }
 }
