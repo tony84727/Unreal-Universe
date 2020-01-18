@@ -1,44 +1,38 @@
 package com.github.tony84727.unrealuniverse.client;
 
+import com.github.tony84727.unrealuniverse.block.Blocks;
 import com.github.tony84727.unrealuniverse.entity.EntityIncendiaryGrenade;
-import net.minecraft.client.Minecraft;
+import com.github.tony84727.unrealuniverse.item.Items;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.SpriteRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.ISprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import java.util.Map;
+
+import static com.github.tony84727.unrealuniverse.UnrealUniverse.MOD_ID;
+
 
 public class ClientProxy {
+    private CustomModelManager customModelManager;
+
     public ClientProxy() {
+        customModelManager = new CustomModelManager();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onBake);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onSetup);
+        customModelManager.add(CustomModel.forItem(Items.INCENDIARY_GRENADE, new ResourceLocation(MOD_ID, "models/item/incendiary_grenade.obj")));
+        customModelManager.add(CustomModel.forBlock(Blocks.GRENADE_CRATE, new ResourceLocation(MOD_ID, "models/block/grenade_crate.obj")));
     }
 
     public void onBake(final ModelBakeEvent e) {
-        try {
-            final IUnbakedModel unbakedModel = OBJLoader.INSTANCE.loadModel(new ResourceLocation("unrealuniverse:models/item/incendiary_grenade.obj"));
-            final IBakedModel baked = unbakedModel.bake(e.getModelLoader(), (location) -> Minecraft.getInstance().getTextureMap().getAtlasSprite(location.toString()), new ISprite() {
-                @Override
-                public boolean isUvLock() {
-                    return false;
-                }
-            }, DefaultVertexFormats.ITEM);
-            e.getModelRegistry().put(new ModelResourceLocation("unrealuniverse:incendiary_grenade", "inventory"), baked);
-        } catch (ModelLoaderRegistry.LoaderException exception) {
-            exception.getCause().printStackTrace();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+        Map<ModelResourceLocation, IBakedModel> models = customModelManager.bake(e.getModelLoader(), ModelLoader.defaultTextureGetter());
+        e.getModelRegistry().putAll(models);
     }
 
     public void onSetup(final FMLClientSetupEvent e) {

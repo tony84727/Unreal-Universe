@@ -30,7 +30,7 @@ public class EntityExplosiveSnowball extends SnowballEntity {
                 newEntity.setPosition(position.x, position.y, position.z);
                 newEntity.setMotion(direction.x, direction.y, direction.z);
                 world.addEntity(newEntity);
-            }, 4);
+            }, 40);
             explosion.explode(getPositionVec(), getMotion());
         }
         super.onImpact(result);
