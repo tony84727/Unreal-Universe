@@ -1,3 +1,10 @@
+import org.gradle.process.internal.ExecAction
+import org.gradle.process.internal.ExecActionFactory
+import org.gradle.process.internal.ExecException
+
+import javax.inject.Inject
+import java.nio.file.Paths
+
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -33,7 +40,7 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'snapshot', version: '20190719-1.14.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -134,3 +141,85 @@ curseforge {
         releaseType = 'alpha'
     }
 }
+
+interface BlenderExportObjParameters extends WorkParameters {
+    RegularFileProperty getBlend()
+
+    RegularFileProperty getPythonScript()
+
+    RegularFileProperty getOutput()
+}
+
+abstract class BlenderExportObj implements WorkAction<BlenderExportObjParameters> {
+    ExecActionFactory factory
+
+    @Inject
+    BlenderExportObj(ExecActionFactory factory) {
+        this.factory = factory
+    }
+
+    @Override
+    void execute() {
+        ExecAction action = factory.newExecAction()
+
+        if (!parameters.output.get().asFile.parentFile.exists()) {
+            parameters.output.get().asFile.parentFile.mkdirs()
+        }
+        action.commandLine(
+                "blender",
+                "-b",
+                parameters.blend.get().asFile.path,
+                "-P",
+                parameters.pythonScript.get().asFile.path,
+                "--",
+                parameters.output.get().asFile.path,
+        )
+        try {
+            action.execute()
+        } catch (ExecException e) {
+            print(action.getCommandLine().join(" ") + " exec failed")
+            throw e
+        }
+    }
+}
+
+class BlenderAssets extends SourceTask {
+    WorkQueue workQueue
+
+    @OutputDirectory
+    File outputDir
+
+    @Inject
+    BlenderAssets(WorkerExecutor workerExecutor) {
+        this.workQueue = workerExecutor.noIsolation()
+    }
+
+    @TaskAction
+    void export() {
+        source.visit {
+            if (it.isDirectory()) return
+            workQueue.submit(BlenderExportObj.class) { BlenderExportObjParameters parameters ->
+                parameters.pythonScript = new File("buildSrc/main/python/generate_obj.py")
+                parameters.blend = it.file
+                // TODO: fix this terrible relative path hack
+                parameters.output = Paths.get(outputDir.path, it.relativePath.replaceLastName(it.relativePath.getLastName().replace(".blend", ".obj")).toString()).toFile()
+            }
+        }
+        workQueue.await()
+    }
+}
+
+def assetOutputDir = "$buildDir/3dModels"
+
+task("blenderAssets", type: BlenderAssets, group: "3dModels") {
+    source = fileTree("blender") {
+        include "**/*.blend"
+    }
+    outputDir = file(assetOutputDir)
+}
+
+processResources {
+    dependsOn blenderAssets
+    from("$buildDir/3dModels")
+}
+
