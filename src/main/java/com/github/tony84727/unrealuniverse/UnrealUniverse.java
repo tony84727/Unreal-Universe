@@ -2,6 +2,7 @@ package com.github.tony84727.unrealuniverse;
 
 import com.github.tony84727.unrealuniverse.block.Blocks;
 import com.github.tony84727.unrealuniverse.client.ClientProxy;
+import com.github.tony84727.unrealuniverse.entity.EntityCohesionGrenade;
 import com.github.tony84727.unrealuniverse.entity.EntityIncendiaryGrenade;
 import com.github.tony84727.unrealuniverse.item.Items;
 import net.minecraft.block.Block;
@@ -31,7 +32,8 @@ public class UnrealUniverse {
             itemRegistryEvent.getRegistry().registerAll(
                     Items.EXPLOSIVE_SNOWBALL,
                     Items.INCENDIARY_GRENADE,
-                    Items.GRENADE_CRATE
+                    Items.GRENADE_CRATE,
+                    Items.COHESION_GRENADE
             );
         }
 
@@ -43,7 +45,11 @@ public class UnrealUniverse {
         @SubscribeEvent
         public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> event) {
             EntityIncendiaryGrenade.ENTITY_TYPE.setRegistryName(MOD_ID, "incendiary_grenade");
-            event.getRegistry().register(EntityIncendiaryGrenade.ENTITY_TYPE);
+            EntityCohesionGrenade.ENTITY_TYPE.setRegistryName(MOD_ID, "cohesion_grenade");
+            event.getRegistry().registerAll(
+                    EntityIncendiaryGrenade.ENTITY_TYPE,
+                    EntityCohesionGrenade.ENTITY_TYPE
+            );
         }
 
         @SubscribeEvent

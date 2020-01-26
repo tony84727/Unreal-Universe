@@ -17,5 +17,6 @@ public class Items {
     };
     public static final ItemIncendiaryGrenade INCENDIARY_GRENADE = new ItemIncendiaryGrenade(new Item.Properties().group(GROUP));
     public static final ItemExplosiveSnowball EXPLOSIVE_SNOWBALL = new ItemExplosiveSnowball(new Item.Properties().group(GROUP));
+    public static final ItemCohesionGrenade COHESION_GRENADE = new ItemCohesionGrenade(new Item.Properties().group(GROUP));
     public static final Item GRENADE_CRATE = new BlockItem(Blocks.GRENADE_CRATE, new Item.Properties().group(GROUP)).setRegistryName(MOD_ID, "grenade_crate");
 }
