@@ -9,5 +9,7 @@ jobs:
       image: winxp/unreal-universe-builder:latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          lfs: true
       - name: Build with Gradle
         run: ./gradlew build
