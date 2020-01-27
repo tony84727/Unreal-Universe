@@ -13,3 +13,7 @@ jobs:
           lfs: true
       - name: Build with Gradle
         run: ./gradlew build
+      - uses: actions/upload-artifact@v1
+        with:
+          name: jar
+          path: build/libs/unrealuniverse-dev.jar
